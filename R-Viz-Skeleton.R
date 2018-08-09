@@ -109,6 +109,11 @@ nh %>%
   group_by(SmokingStatus) %>% 
   summarize(meanBMI = mean(BMI, na.rm = TRUE))
 
+nh %>% 
+  filter(Age > 18) %>% 
+  group_by(SmokingStatus, Diabetes) %>% 
+  summarize(meanBMI = mean(BMI, na.rm = TRUE))
+
 # ggplot2 ---------
 
 # allows you to build a plot layer-by-layer by specifying:
@@ -119,105 +124,262 @@ nh %>%
  
 # Scatterplots ---------
 # Age (X) against Height (Y) (continuous X, continuous Y)
+nh %>% 
+  ggplot(aes(x = Age, y = Height)) #just canvas, add geoms for scatterplot
+
+nh %>% 
+  ggplot(aes(x = Age, y = Height)) +  #use'+' instead of pipe for ggplot package
+  geom_point()
 
 # color the points by Gender
+nh %>% 
+  ggplot(aes(x = Age, y = Height, color = Gender)) +
+  geom_point()
+
+#or; colors only the geom_point plot but not downstream additions
+nh %>% 
+  ggplot(aes(x = Age, y = Height)) +
+  geom_point(aes(color = Gender))
 
 # color the points blue and shape them as +
+nh %>% 
+  ggplot(aes(x = Age, y = Height)) +
+  geom_point(color = "blue", shape = 3)
 
 # what is the difference between coloring by a variable and coloring by static values?
+  #don't need to call aesthetics for whole plot changes, only for mods to a certain variable
 
 # plot points colored by Gender and smoothed line
+nh %>% 
+  ggplot(aes(x = Age, y = Height)) +
+  geom_point(aes(color = Gender)) +
+  geom_smooth(method = "auto")
+
+?geom_smooth()
 
 # plot smoothed trend line and points both colored by gender
+nh %>% 
+  ggplot(aes(x = Age, y = Height)) +
+  geom_point(aes(color = Gender)) +
+  geom_smooth(aes(color = Gender))
 
 # color all layers by Gender
+nh %>% 
+  ggplot(aes(x = Age, y = Height, color = Gender)) +
+  geom_point() +
+  geom_smooth()
+
 
 # color all layers by Gender, add transparency to points, make line bolder
+nh %>% 
+  ggplot(aes(x = Age, y = Height, color = Gender)) +
+  geom_point(alpha = .2 ) + #add transparency with alpha
+  geom_smooth(lwd = 2) #increase weight of line
+
 
 # ** EXERCISE 2 ** ----------
 # ** YOUR TURN **
 #   A. Use a scatterplot to investigate the relationship between Age and Testosterone.
+nh %>% 
+  ggplot(aes(x = Age, y = Testosterone)) +
+  geom_point()
 
 #   B. Color the plot in A by Gender.
+nh %>% 
+  ggplot(aes(x = Age, y = Testosterone, color = Gender)) +
+  geom_point()
+
+#or
+nh %>% 
+  ggplot(aes(x = Age, y = Testosterone)) +
+  geom_point(aes(color = Gender))
 
 #   C. Create the plot in A for just men.
+nh %>%
+  filter(Gender == "male") %>% 
+  ggplot(aes(x = Age, y = Testosterone)) +
+  geom_point()
 
 #   D. Filter for men > 65 and < 80 years old and then examine the relationship between Age and Testosterone.
+nh %>%
+  filter(Gender == "male") %>% 
+  filter(Age > 65 & Age < 80) %>% 
+  ggplot(aes(x = Age, y = Testosterone)) +
+  geom_point()
 
 #   E. Does the relationship you saw in D differ if the man is physically active (PhysActive == "Yes")? Use colored loess lines to see the effect of physical activity.
+nh %>%
+  filter(Gender == "male") %>% 
+  filter(Age > 65 & Age < 80) %>% 
+  ggplot(aes(x = Age, y = Testosterone)) +
+  geom_point() + 
+  geom_smooth(lwd = 2, aes(color = PhysActive))
+  
 
 # Visualizations for discrete X ---------
 # Plot BMI by Smoking Status
 # blank canvas, note categories on X
+nh %>% 
+  ggplot(aes(x = SmokingStatus, y = BMI))
 
 # try with geom point
+nh %>% 
+  ggplot(aes(x = SmokingStatus, y = BMI)) +
+  geom_point()
 
-# no variability in X values --> overplotting
+# no variability in X values --> overplotting: many points on top of each other so can't see data
 # so add some random variability to x-axis using geom_jitter
+nh %>% 
+  ggplot(aes(x = SmokingStatus, y = BMI)) +
+  geom_jitter()
 
-# remove NA category and add transparency
+# remove NA category and add transparency; use !is.na() in filter to remove NA or missing values
+nh %>% 
+  filter(!is.na(SmokingStatus)) %>% 
+  ggplot(aes(x = SmokingStatus, y = BMI)) +
+  geom_jitter(alpha = 0.25)
 
 # plot boxplot
+nh %>% 
+  filter(!is.na(SmokingStatus)) %>% 
+  ggplot(aes(x = SmokingStatus, y = BMI)) +
+  geom_boxplot()
 
 # plot jitter and boxplot
+nh %>% 
+  filter(!is.na(SmokingStatus)) %>% 
+  ggplot(aes(x = SmokingStatus, y = BMI)) +
+  geom_jitter(alpha = 0.25) +
+  geom_boxplot()
 
 # improve the jitter/boxplot
+nh %>% 
+  filter(!is.na(SmokingStatus)) %>% 
+  ggplot(aes(x = SmokingStatus, y = BMI)) +
+  geom_jitter(alpha = 0.25) +
+  geom_boxplot(alpha = 0.5, outlier.colour = NA)
 
 # color boxplot by gender
+nh %>% 
+  filter(!is.na(SmokingStatus)) %>% 
+  ggplot(aes(x = SmokingStatus, y = BMI)) +
+  geom_boxplot(aes(color = Gender))
 
 # fill boxplot by gender
+nh %>% 
+  filter(!is.na(SmokingStatus)) %>% 
+  ggplot(aes(x = SmokingStatus, y = BMI)) +
+  geom_boxplot(aes(fill = Gender))
 
 # **EXERCISE 3** ----------
 # ** YOUR TURN **
 #   A. Create boxplots showing height for Adults of different Races
+nh %>% 
+  filter(Age >= 18) %>% 
+  ggplot(aes(x = Race, y = Height)) +
+  geom_boxplot()
 
 #   B. Add jittered data under boxplots in A.
-
+nh %>% 
+  filter(Age >= 18) %>% 
+  ggplot(aes(x = Race, y = Height)) +
+  geom_jitter(alpha = 0.25) +
+  geom_boxplot(alpha = 0.5, outlier.colour = NA) 
+ 
 #   C. Fill boxplots in A by Gender
+nh %>% 
+  filter(Age >= 18) %>% 
+  ggplot(aes(x = Race, y = Height)) +
+  geom_boxplot(aes(fill = Gender))
 
 # Plotting univariate continuous data -------
 
 #canvas for height
+nh %>% 
+  ggplot(aes(Height))
 
 # save canvas as p then add histogram
+p <- nh %>% 
+  ggplot(aes(Height))
+p
+p + geom_histogram()
 
 # change bin size
+p + geom_histogram(bins = 80)
+p + geom_histogram(bins = 10)
+p + geom_histogram(bins = 100)
 
 # smoothed density curve
+p + geom_density()
 
 # histogram colored by Race
+p + geom_histogram(aes(color = Race))
 
 # histogram filled by Race
+p + geom_histogram(aes(fill = Race))
 
 # get help on histogram function
+?geom_histogram
 
 # change position
+p + geom_histogram(aes(fill = Race), position = "identity", bins = 85)
+#these histograms are blocking each other; identity position layers histograms by depth
 
 # add transparency
+p + geom_histogram(aes(fill = Race), position = "identity", bins = 85, alpha = 1/3)
 
 # try with density curves colored by Race
+p + geom_density(aes(color = Race))
 
 # change fill color and add transparency
+p + geom_density(aes(color = Race, fill = Race, alpha = 1/8))
 
-# Faceting -----------
+# Faceting ----------- 
+  #makes miniature plots of that variable
 
 # overlapping histograms filled by Race
+p + geom_histogram(aes(fill = Race), position = "identity", bins = 85)
 
 # facet histograms by race
+p + geom_histogram(aes(fill = Race)) +
+  facet_wrap(~Race)
 
 # facet density plots by Race
+p + geom_density(aes(color = Race)) +
+  facet_wrap(~Race)
 
 # Choosing colors and themes ----------
 
 # boxplot of BMI by Smoking status without missing Smoking Status
+nh %>% 
+  filter(!is.na(SmokingStatus)) %>% 
+  ggplot(aes(x = SmokingStatus, y = BMI)) +
+  geom_boxplot()
 
 # filled by Diabetes
+nh %>% 
+  filter(!is.na(SmokingStatus)) %>% 
+  ggplot(aes(x = SmokingStatus, y = BMI)) +
+  geom_boxplot(aes(fill = Diabetes))
 
-# see all color options
+# see all color options; viridis package has popular color scheme
+colors()
 
 #change colors manually
+nh %>% 
+  filter(!is.na(SmokingStatus)) %>% 
+  ggplot(aes(x = SmokingStatus, y = BMI)) +
+  geom_boxplot(aes(fill = Diabetes)) +
+  scale_fill_manual(values = c("cornflowerblue", "salmon"))
 
 #change theme
+nh %>% 
+  filter(!is.na(SmokingStatus)) %>% 
+  ggplot(aes(x = SmokingStatus, y = BMI)) +
+  geom_boxplot(aes(fill = Diabetes)) +
+  scale_fill_manual(values = c("cornflowerblue", "salmon")) +
+  theme_bw() #takes out gray background; classic has zero lines; minimal without axis lines
+#ggthemes package has more theme options 
 
 # ** EXERCISE 4 ** ----------
 # ** YOUR TURN **
@@ -225,8 +387,30 @@ nh %>%
 
 #   A. 
 #   No = not physically active, Yes = physically active
+nh %>% 
+  filter(!is.na(PhysActive) & Gender == "male") %>% 
+  filter(Age > 65 & Age < 80) %>% 
+  ggplot(aes(x = Age, y = Testosterone)) +
+  geom_point() +
+  geom_smooth() +
+  facet_wrap(~PhysActive)
 
 #   B. 
 #   Custom colors are "salmon" and "seagreen"
+nh %>% 
+  ggplot(aes(x = RelationshipStatus, y = AlcoholYear)) +
+  geom_boxplot(aes(fill = Gender)) +
+  scale_fill_manual(values = c("salmon", "seagreen"))
 
 #   C. 
+nh %>% 
+  filter(Age < 20) %>% 
+  ggplot(aes(x = Age, y = Height)) +
+  geom_smooth(aes(color = Gender)) +
+  scale_fill_manual(values = c("salmon", "seagreen")) +
+  facet_wrap(~Race)
+  
+  
+  
+  
+
