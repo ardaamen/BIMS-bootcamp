@@ -1,3 +1,4 @@
+# Using 4 characters (slashes/dashes/comments/etc.) adds these lines to code outline; to access select icon on top left of source window; these lines are indicated by an arrow next to the row number on code
 
 # Load library -----
 library(tidyverse) #an R environment that tries to "tidy" up and unify the way basic functions are used
@@ -23,14 +24,14 @@ View(nh)
 
 # dplyr review --------
 
-# Access dplyr cheat sheet from `Help` menu
+# Access dplyr cheat sheet from `Help` menu > Cheatsheets link
 
 # dplyr verbs
 # 1. `filter()`
 # 2.. `group_by()` 
 # 3. `summarize()`
 
-# dplyr takes a tibble dataframe as its first argument and then a logical condition to meet as the second argument.
+# dplyr takes a tibble dataframe as its first argument and then a logical condition to meet as the second argument
 
 # - `==`: Equal to
 # - `!=`: Not equal to
@@ -41,46 +42,69 @@ View(nh)
 # The "or" operator `|` (the pipe character, usually shift-backslash) will return a subset that meet *any* of the conditions.
 
 # Let's use filter to return rows where the person was elderly (defined as >= 80 years old)
+filter(nh, Age >= 80)
+filter(nh, Age == 80)
 
 
-
-# Using the pipe -----
+# Using the pipe ----- 
 # `%>%` or `Control + Shift + M` 
 
 # `head()` without pipe
+head(nh, 8)
 
-
-# `head()` with pipe
-
+# `head()` with pipe; start with data set and then functions to modify the data set
+nh %>% head(8)
 
 # Now let's use the pipe operator with filter to subset for elderly people >= 80 years old
 # without pipe
-
+filter(nh, Age >= 80)
 
 # with pipe
-
+nh %>% filter(Age >= 80)
 
 # Nesting v. %>% ----------
 
 # Let's say we want to see the mean height, grouped by Race, only for adults.
 # without pipe
+summarize(
+  group_by(
+    filter(nh, Age > 18), Race), meanHeight = mean(Height, na.rm = TRUE))
 
-
-# with pipe
-
+# with pipe; allows arguments that belong to a function to stay with that function 
+nh %>% 
+  filter(Age < 18) %>% 
+  group_by(Race) %>% 
+  summarize(meanHeight = mean(Height, na.rm = TRUE))
 
 # with pipe arranged in order
+nh %>% 
+  filter(Age > 18) %>% 
+  group_by(Race) %>% 
+  summarize(meanHeight = mean(Height, na.rm = TRUE)) %>% 
+  arrange(meanHeight)
 
+#desc arrange
+nh %>% 
+  filter(Age > 18) %>% 
+  group_by(Race) %>% 
+  summarize(meanHeight = mean(Height, na.rm = TRUE)) %>% 
+  arrange(desc(meanHeight))
 
 # ** EXERCISE 1 ** ------------
 # ** YOUR TURN **
 #   A. How many observations are there of children (< 18 years old)?
- 
-#   B. How many cases of obese children are there (BMI >= 30)?
+nh %>% filter(Age < 18) 
 
+#   B. How many cases of obese children are there (BMI >= 30)?
+nh %>% filter(Age < 18) %>% 
+  filter(BMI <= 30) 
 
 #   C. Use `filter()`, `group_by()` and `summarize()` to find the mean BMI by Smoking Status for only Adults who have Diabetes. Do diabetic smokers or non-smokers have higher BMI?
-
+nh %>% 
+  filter(Age > 18) %>% 
+  filter(Diabetes == "Yes") %>% 
+  group_by(SmokingStatus) %>% 
+  summarize(meanBMI = mean(BMI, na.rm = TRUE))
 
 # ggplot2 ---------
 
