@@ -1,21 +1,25 @@
 
 # Load library -----
-
+library(tidyverse) #an R environment that tries to "tidy" up and unify the way basic functions are used
+# or load readr, dplyr, ggplot2 if issues; all are in tidyverse library
 
 # Download data and skeleton script from GitHub into project -----
- 
+
 # Go to GitHub [repo](https://github.com/mariekekjones/BIMS-bootcamp) to get these materials
 
-# NHANES data ----
+# NHANES data ---- .csv table file to read in
 
-# Read in downloaded data using `read_csv()` from {readr} package
-
+# Read in downloaded data using `read_csv()` from {readr} package; reads into a tibble: a "tidy dataframe"
+nh <- read_csv("nhanes.csv")
 
 # Show the first few lines of the data and the dimensions
+head(nh) #default is first 6 rows as a tibble 
+head(nh, 10) #to show more rows, in this case, 10
 
+dim(nh) #shows dimensions in rowsxcolumns
 
 # Optionally bring up data in a viewer window.
-
+View(nh)
 
 # dplyr review --------
 
