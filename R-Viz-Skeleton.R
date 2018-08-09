@@ -99,6 +99,9 @@ nh %>% filter(Age < 18)
 nh %>% filter(Age < 18) %>% 
   filter(BMI <= 30) 
 
+nh %>% 
+  filter(Age < 18 & BMI >= 30)
+
 #   C. Use `filter()`, `group_by()` and `summarize()` to find the mean BMI by Smoking Status for only Adults who have Diabetes. Do diabetic smokers or non-smokers have higher BMI?
 nh %>% 
   filter(Age > 18) %>% 
